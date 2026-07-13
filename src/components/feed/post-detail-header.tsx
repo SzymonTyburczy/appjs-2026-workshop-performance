@@ -28,7 +28,78 @@ interface PostDetailHeaderProps {
   // onLike: () => void;
   // onShareComplete: () => void;
 }
+function PostDetailActions({ post }: { post: FeedPost }) {
+  const colors = useContext(ColorsContext);
+  const router = useRouter();
 
+  const [isLiked, setIsLiked] = useState(post.isLiked);
+  const [likesCount, setLikesCount] = useState(post.likes);
+  const [shareCount, setShareCount] = useState(0);
+
+  const handleLike = () => {
+    setIsLiked((prevIsLiked) => {
+      const nextIsLiked = !prevIsLiked;
+
+      setLikesCount(
+        (prevLikesCount) => prevLikesCount + (nextIsLiked ? 1 : -1),
+      );
+
+      return nextIsLiked;
+    });
+  };
+
+  return (
+    <>
+      <View
+        style={{
+          flexDirection: "row",
+          justifyContent: "space-between",
+          alignItems: "center",
+          paddingHorizontal: 12,
+          paddingVertical: 8,
+        }}
+      >
+        <View style={{ flexDirection: "row", alignItems: "center", gap: 14 }}>
+          <LikeButton isLiked={isLiked} colors={colors} onPress={handleLike} />
+          <ShareButton
+            postId={post.id}
+            username={post.user.username}
+            colors={colors}
+            onShareComplete={() =>
+              setShareCount((prevShareCount) => prevShareCount + 1)
+            }
+          />
+        </View>
+
+        <BookmarkButton
+          initialIsBookmarked={post.isBookmarked}
+          colors={colors}
+        />
+      </View>
+
+      <View
+        style={{
+          flexDirection: "row",
+          alignItems: "center",
+          gap: 8,
+          paddingHorizontal: 12,
+        }}
+      >
+        <TouchableOpacity onPress={() => router.push(`/likes/${post.id}`)}>
+          <Text style={{ fontWeight: "600", fontSize: 14, color: colors.text }}>
+            {likesCount.toLocaleString()} likes
+          </Text>
+        </TouchableOpacity>
+
+        {shareCount > 0 && (
+          <Text style={{ fontSize: 14, color: colors.icon }}>
+            · {shareCount} {shareCount === 1 ? "share" : "shares"}
+          </Text>
+        )}
+      </View>
+    </>
+  );
+}
 export const PostDetailHeader = ({
   post,
   // isLiked: boolean;
@@ -45,20 +116,20 @@ export const PostDetailHeader = ({
   const [menuAnchor, setMenuAnchor] = useState<
     { x: number; y: number } | undefined
   >();
-  const [isLiked, setIsLiked] = useState(post.isLiked);
-  const [likesCount, setLikesCount] = useState(post.likes);
-  const [shareCount, setShareCount] = useState(0);
-  const handleLike = () => {
-    setIsLiked((prevIsLiked) => {
-      const nextIsLiked = !prevIsLiked;
+  // const [isLiked, setIsLiked] = useState(post.isLiked);
+  // const [likesCount, setLikesCount] = useState(post.likes);
+  // const [shareCount, setShareCount] = useState(0);
+  // const handleLike = () => {
+  //   setIsLiked((prevIsLiked) => {
+  //     const nextIsLiked = !prevIsLiked;
 
-      setLikesCount(
-        (prevLikesCount) => prevLikesCount + (nextIsLiked ? 1 : -1),
-      );
+  //     setLikesCount(
+  //       (prevLikesCount) => prevLikesCount + (nextIsLiked ? 1 : -1),
+  //     );
 
-      return nextIsLiked;
-    });
-  };
+  //     return nextIsLiked;
+  //   });
+  // };
 
   return (
     <View>
@@ -139,7 +210,7 @@ export const PostDetailHeader = ({
       />
 
       <ImageCarousel images={post.images} />
-
+{/* 
       <View
         style={{
           flexDirection: "row",
@@ -156,8 +227,8 @@ export const PostDetailHeader = ({
             username={post.user.username}
             colors={colors}
             onShareComplete={() =>
-              setShareCount((prevShareCount) => prevShareCount + 1)
-            }
+  setShareCount((prevShareCount) => prevShareCount + 1)
+}
           />
         </View>
         <BookmarkButton
@@ -184,7 +255,8 @@ export const PostDetailHeader = ({
             · {shareCount} {shareCount === 1 ? "share" : "shares"}
           </Text>
         )}
-      </View>
+      </View> */}
+      <PostDetailActions post={post} />
 
       {post.caption.length > 0 && (
         <View style={{ paddingHorizontal: 12, paddingTop: 4 }}>
