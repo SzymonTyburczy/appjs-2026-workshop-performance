@@ -210,7 +210,7 @@ export const PostDetailHeader = ({
       />
 
       <ImageCarousel images={post.images} />
-{/* 
+      {/* 
       <View
         style={{
           flexDirection: "row",
