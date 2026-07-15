@@ -1,5 +1,12 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useState, useEffect, useCallback, useRef, useTransition } from "react";
+import {
+  useState,
+  useEffect,
+  useCallback,
+  useRef,
+  useTransition,
+  useDeferredValue,
+} from "react";
 import {
   View,
   Text,
@@ -43,29 +50,26 @@ const PostDetailScreen = () => {
   const [comments, setComments] = useState<FeedComment[]>([]);
   const [newComment, setNewComment] = useState("");
   const [replyInfo, setReplyInfo] = useState<ReplyInfo | null>(null);
-  const [showRelatedPosts, setShowRelatedPosts] = useState(false);
   //const [shareCount, setShareCount] = useState(0);
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
+  const deferredPost = useDeferredValue(post);
 
   useEffect(() => {
-    setShowRelatedPosts(false);
     const foundPost = findPostForDetails(id);
     if (foundPost) {
       setPost(foundPost);
       // setIsLiked(foundPost.isLiked);
       // setLikesCount(foundPost.likes);
       setComments(foundPost.comments);
-      startTransition(() => {
-        setShowRelatedPosts(true);
-      });
     }
-  }, [id, startTransition]);
+  }, [id]);
 
   const hasNewComments = comments.length > prevCommentsLengthRef.current;
   prevCommentsLengthRef.current = comments.length;
 
-  const relatedPosts = showRelatedPosts && post ? findRelatedPosts(post) : [];
+  const relatedPosts =
+    post && deferredPost?.id === post.id ? findRelatedPosts(deferredPost) : [];
 
   const handleReply = useCallback((commentId: string, username: string) => {
     setReplyInfo({ commentId, username });
