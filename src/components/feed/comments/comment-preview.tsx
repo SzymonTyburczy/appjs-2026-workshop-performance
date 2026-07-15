@@ -3,8 +3,8 @@ import { View, Text, TouchableOpacity, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 
 import { ColorsContext } from "@/context/colors-context";
-import { HeartIcon } from "@/components/feed/icons/heart-icon";
 import { ImageWithShimmer } from "@/components/feed/shimmer/image-with-shimmer";
+import { IconSymbol } from "@/components/ui/icon-symbol";
 import { FeedComment } from "@/data/mock-feed";
 import { formatRelativeTime } from "@/utils/feed-utils";
 import { getSizedImageUri } from "@/utils/image-utils";
@@ -59,7 +59,11 @@ export const CommentPreview = ({ comment, postId }: { comment: FeedComment; post
         }}
         style={styles.heartButton}
       >
-        <HeartIcon size={12} color={isLiked ? "#FF6B6B" : colors.icon} filled={isLiked} />
+        <IconSymbol
+          name={isLiked ? "heart.fill" : "heart"}
+          size={12}
+          color={isLiked ? "#FF6B6B" : colors.icon}
+        />
       </TouchableOpacity>
     </View>
   );

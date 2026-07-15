@@ -5,7 +5,7 @@ import * as Haptics from "expo-haptics";
 import { useRouter } from "expo-router";
 
 import { ColorsContext } from "@/context/colors-context";
-import { MenuIcon } from "@/components/feed/icons/menu-icon";
+import { IconSymbol } from "@/components/ui/icon-symbol";
 
 const { width: SCREEN_WIDTH } = Dimensions.get("window");
 const POPOVER_WIDTH = 220;
@@ -20,6 +20,14 @@ interface PostOptionsMenuProps {
 }
 
 type MenuIconName = "bell" | "link" | "share" | "person" | "eye-slash" | "flag";
+const MENU_ICON_SYMBOLS = {
+  bell: "bell",
+  link: "link",
+  share: "square.and.arrow.up",
+  person: "person",
+  "eye-slash": "eye.slash",
+  flag: "flag",
+} as const;
 
 interface MenuOption {
   icon: MenuIconName;
@@ -124,7 +132,11 @@ export const PostOptionsMenu = ({
                 },
               ]}
             >
-              <MenuIcon name={option.icon} size={18} color={option.destructive ? "#FF6B6B" : colors.text} />
+              <IconSymbol
+                name={MENU_ICON_SYMBOLS[option.icon]}
+                size={18}
+                color={option.destructive ? "#FF6B6B" : colors.text}
+              />
               <Text style={[styles.menuLabel, { color: option.destructive ? "#FF6B6B" : colors.text }]}>
                 {option.label}
               </Text>
