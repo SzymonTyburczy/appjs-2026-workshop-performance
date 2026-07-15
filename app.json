@@ -46,7 +46,8 @@
       "./plugins/withAutomaticIosSigning"
     ],
     "experiments": {
-      "typedRoutes": true
+      "typedRoutes": true,
+      "reactCompiler": true
     }
   }
 }
