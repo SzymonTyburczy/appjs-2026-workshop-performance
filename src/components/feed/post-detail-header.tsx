@@ -1,4 +1,4 @@
-import { useContext, useState } from "react";
+import { useCallback, useContext, useState } from "react";
 import { useRouter } from "expo-router";
 import {
   GestureResponderEvent,
@@ -48,6 +48,10 @@ function PostDetailActions({ post }: { post: FeedPost }) {
     });
   };
 
+  const handleShareComplete = useCallback(() => {
+    setShareCount((prevShareCount) => prevShareCount + 1);
+  }, []);
+
   return (
     <>
       <View
@@ -65,9 +69,7 @@ function PostDetailActions({ post }: { post: FeedPost }) {
             postId={post.id}
             username={post.user.username}
             colors={colors}
-            onShareComplete={() =>
-              setShareCount((prevShareCount) => prevShareCount + 1)
-            }
+            onShareComplete={handleShareComplete}
           />
         </View>
 
