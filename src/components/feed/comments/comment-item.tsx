@@ -1,10 +1,12 @@
 import { useState } from "react";
-import { View, Text, Image, TouchableOpacity } from "react-native";
+import { Image } from "expo-image";
+import { View, Text, TouchableOpacity } from "react-native";
 
 import { IconSymbol } from "@/components/ui/icon-symbol";
 import { Colors } from "@/constants/theme";
 import { FeedComment } from "@/data/mock-feed";
 import { formatRelativeTime } from "@/utils/feed-utils";
+import { getSizedImageUri } from "@/utils/image-utils";
 
 export const CommentItem = ({ 
   comment,
@@ -40,12 +42,15 @@ export const CommentItem = ({
       >
         <TouchableOpacity onPress={() => onProfilePress(comment.username)}>
           <Image
-            source={{ uri: comment.avatar }}
+            source={{
+              uri: getSizedImageUri(comment.avatar, isReply ? 28 : 36),
+            }}
             style={{
               width: isReply ? 28 : 36,
               height: isReply ? 28 : 36,
               borderRadius: isReply ? 14 : 18
             }}
+            contentFit="cover"
           />
         </TouchableOpacity>
         <View style={{ flex: 1 }}>

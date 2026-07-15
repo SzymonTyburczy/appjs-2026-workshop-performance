@@ -1,8 +1,10 @@
 import { forwardRef, useCallback, useMemo } from "react";
-import { View, Text, TextInput, TouchableOpacity, ScrollView, Image } from "react-native";
+import { Image } from "expo-image";
+import { View, Text, TextInput, TouchableOpacity, ScrollView } from "react-native";
 
 import { Colors } from "@/constants/theme";
 import { FeedComment } from "@/data/mock-feed";
+import { getSizedImageUri } from "@/utils/image-utils";
 import { buildMentionSuggestions } from "@/utils/mention-utils";
 
 function MentionSuggestions({
@@ -115,8 +117,11 @@ const CommentInput = forwardRef<TextInput, CommentInputProps>(function CommentIn
         }}
       >
         <Image
-          source={{ uri: "https://i.pravatar.cc/150?img=68" }}
+          source={{
+            uri: getSizedImageUri("https://i.pravatar.cc/150?img=68", 32),
+          }}
           style={{ width: 32, height: 32, borderRadius: 16 }}
+          contentFit="cover"
         />
 
         <TextInput

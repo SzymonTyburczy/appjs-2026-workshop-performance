@@ -1,8 +1,8 @@
 import { useContext, useState } from "react";
 import { useRouter } from "expo-router";
+import { Image } from "expo-image";
 import {
   GestureResponderEvent,
-  Image,
   Text,
   TouchableOpacity,
   View,
@@ -17,6 +17,7 @@ import { IconSymbol } from "@/components/ui/icon-symbol";
 import { ColorsContext } from "@/context/colors-context";
 import { FeedPost } from "@/data/mock-feed";
 import { formatRelativeTime } from "@/utils/feed-utils";
+import { getSizedImageUri } from "@/utils/image-utils";
 
 interface PostDetailHeaderProps {
   post: FeedPost;
@@ -147,7 +148,7 @@ export const PostDetailHeader = ({
           onPress={() => router.push(`/profile/${post.user.username}`)}
         >
           <Image
-            source={{ uri: post.user.avatar }}
+            source={{ uri: getSizedImageUri(post.user.avatar, 36) }}
             style={{
               width: 36,
               height: 36,
@@ -155,6 +156,7 @@ export const PostDetailHeader = ({
               borderWidth: 2,
               borderColor: "#271c2d",
             }}
+            contentFit="cover"
           />
           <View>
             <View

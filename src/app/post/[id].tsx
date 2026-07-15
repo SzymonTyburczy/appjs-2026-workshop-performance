@@ -10,13 +10,13 @@ import {
 import {
   View,
   Text,
-  Image,
   TouchableOpacity,
   FlatList,
   TextInput,
   KeyboardAvoidingView,
   Platform,
 } from "react-native";
+import { Image } from "expo-image";
 import { useSafeAreaInsets } from "react-native-safe-area-context";
 
 import { PostDetailHeader } from "@/components/feed/post-detail-header";
@@ -30,6 +30,7 @@ import { detectSpam } from "@/utils/spam-detection";
 
 import { CommentInput } from "@/components/feed/comment-input";
 import { CommentItem } from "@/components/feed/comments/comment-item";
+import { getSizedImageUri } from "@/utils/image-utils";
 import { findRelatedPosts } from "@/utils/related-posts";
 
 interface ReplyInfo {
@@ -275,11 +276,14 @@ const PostDetailScreen = () => {
                     >
                       <Image
                         source={{
-                          uri:
+                          uri: getSizedImageUri(
                             item.post.images[0]?.thumbnailUri ||
-                            item.post.images[0]?.uri,
+                              item.post.images[0]?.uri,
+                            140,
+                          ),
                         }}
                         style={{ width: 140, height: 140, borderRadius: 8 }}
+                        contentFit="cover"
                       />
                       <Text
                         numberOfLines={1}
