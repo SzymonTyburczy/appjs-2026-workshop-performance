@@ -1,5 +1,5 @@
 import { useLocalSearchParams, useRouter } from "expo-router";
-import { useState, useEffect, useCallback, useRef } from "react";
+import { useState, useEffect, useCallback, useRef, useTransition } from "react";
 import {
   View,
   Text,
@@ -36,30 +36,36 @@ const PostDetailScreen = () => {
   const insets = useSafeAreaInsets();
   const inputRef = useRef<TextInput>(null);
   const prevCommentsLengthRef = useRef(0);
+  const [, startTransition] = useTransition();
   const [post, setPost] = useState<FeedPost | null>(null);
   // const [isLiked, setIsLiked] = useState(false);
   // const [likesCount, setLikesCount] = useState(0);
   const [comments, setComments] = useState<FeedComment[]>([]);
   const [newComment, setNewComment] = useState("");
   const [replyInfo, setReplyInfo] = useState<ReplyInfo | null>(null);
+  const [showRelatedPosts, setShowRelatedPosts] = useState(false);
   //const [shareCount, setShareCount] = useState(0);
   const colorScheme = useColorScheme();
   const colors = Colors[colorScheme ?? "light"];
 
   useEffect(() => {
+    setShowRelatedPosts(false);
     const foundPost = findPostForDetails(id);
     if (foundPost) {
       setPost(foundPost);
       // setIsLiked(foundPost.isLiked);
       // setLikesCount(foundPost.likes);
       setComments(foundPost.comments);
+      startTransition(() => {
+        setShowRelatedPosts(true);
+      });
     }
-  }, [id]);
+  }, [id, startTransition]);
 
   const hasNewComments = comments.length > prevCommentsLengthRef.current;
   prevCommentsLengthRef.current = comments.length;
 
-  const relatedPosts = post ? findRelatedPosts(post) : [];
+  const relatedPosts = showRelatedPosts && post ? findRelatedPosts(post) : [];
 
   const handleReply = useCallback((commentId: string, username: string) => {
     setReplyInfo({ commentId, username });
@@ -102,22 +108,24 @@ const PostDetailScreen = () => {
       replies: [],
     };
 
-    if (replyInfo) {
-      // Add as reply to existing comment
-      setComments((prev) =>
-        prev.map((comment) => {
-          if (comment.id === replyInfo.commentId) {
-            return {
-              ...comment,
-              replies: [...(comment.replies || []), newCommentObj],
-            };
-          }
-          return comment;
-        }),
-      );
-    } else {
-      setComments((prev) => [newCommentObj, ...prev]);
-    }
+    startTransition(() => {
+      if (replyInfo) {
+        // Add as reply to existing comment
+        setComments((prev) =>
+          prev.map((comment) => {
+            if (comment.id === replyInfo.commentId) {
+              return {
+                ...comment,
+                replies: [...(comment.replies || []), newCommentObj],
+              };
+            }
+            return comment;
+          }),
+        );
+      } else {
+        setComments((prev) => [newCommentObj, ...prev]);
+      }
+    });
 
     setNewComment("");
     setReplyInfo(null);
