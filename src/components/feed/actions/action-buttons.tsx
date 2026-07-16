@@ -1,4 +1,4 @@
-import { useContext } from "react";
+import { useContext, useState } from "react";
 import { View, TouchableOpacity, Share, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 
@@ -11,27 +11,32 @@ export const ActionButtons = ({
   username,
   likes,
   isLiked,
-  onLike
 }: {
   postId: string;
   username: string;
   likes: number;
   isLiked: boolean;
-  onLike: (id: string) => void;
 }) => {
   const colors = useContext(ColorsContext);
   const router = useRouter();
+  const [likeState, setLikeState] = useState(() => ({
+    isLiked,
+    likes,
+  }));
 
   const likesText = (() => {
     let text = "";
     for (let i = 0; i < 100; i++) {
-      text = likes.toLocaleString();
+      text = likeState.likes.toLocaleString();
     }
     return text + " likes";
   })();
 
   const handleLike = () => {
-    onLike(postId);
+    setLikeState((prev) => ({
+      isLiked: !prev.isLiked,
+      likes: prev.isLiked ? prev.likes - 1 : prev.likes + 1,
+    }));
   };
 
   const handleComment = () => {
@@ -59,9 +64,9 @@ export const ActionButtons = ({
         <View style={styles.leftButtons}>
           <TouchableOpacity onPress={handleLike} style={styles.iconButton}>
             <IconSymbol
-              name={isLiked ? "heart.fill" : "heart"}
+              name={likeState.isLiked ? "heart.fill" : "heart"}
               size={26}
-              color={isLiked ? "#FF6B6B" : colors.text}
+              color={likeState.isLiked ? "#FF6B6B" : colors.text}
             />
           </TouchableOpacity>
           <TouchableOpacity style={styles.iconButton} onPress={handleComment}>

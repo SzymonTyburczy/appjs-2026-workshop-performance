@@ -16,10 +16,8 @@ import { PostHeader } from "./header/post-header";
 
 const FeedItemComponent = ({
   item,
-  onLike,
 }: {
   item: FeedPostSlim;
-  onLike: (id: string) => void;
 }) => {
   const colors = useContext(ColorsContext);
   const router = useRouter();
@@ -58,7 +56,6 @@ const FeedItemComponent = ({
         username={item.user.username}
         likes={item.likes}
         isLiked={item.isLiked}
-        onLike={onLike}
       />
 
       <PostCaption username={item.user.username} caption={item.caption} />
