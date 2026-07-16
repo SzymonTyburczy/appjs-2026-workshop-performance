@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useCallback, useState } from "react";
 import { View, StyleSheet } from "react-native";
 
 import { FeedHeader } from "@/components/feed/feed-header";
@@ -16,14 +16,15 @@ const HomeScreen = () => {
 
 
 
-  const handleLike = (id: string) => {
+  const handleLike = useCallback((id: string) => {
     setFeedData(prev =>
       prev.map(item => {
         if (item.type !== "post" || item.id !== id) return item;
         return { ...item, isLiked: !item.isLiked, likes: item.isLiked ? item.likes - 1 : item.likes + 1 };
       })
     );
-  };
+  }, []);
+
 
 
   return (

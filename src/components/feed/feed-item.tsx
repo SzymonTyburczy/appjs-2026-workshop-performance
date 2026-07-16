@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { memo, useState, useContext } from "react";
 import { View, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 
@@ -14,7 +14,7 @@ import { PostTimestamp } from "./content/post-timestamp";
 import { TagList } from "./content/tag-list";
 import { PostHeader } from "./header/post-header";
 
-export const FeedItem = ({
+const FeedItemComponent = ({
   item,
   onLike,
 }: {
@@ -80,3 +80,5 @@ const styles = StyleSheet.create({
     borderBottomWidth: 0.5,
   },
 });
+
+export const FeedItem = memo(FeedItemComponent);
