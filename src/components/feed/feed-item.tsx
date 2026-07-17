@@ -1,4 +1,4 @@
-import { memo, useState, useContext } from "react";
+import { memo, useCallback, useContext, useMemo, useState } from "react";
 import { View, StyleSheet } from "react-native";
 import { useRouter } from "expo-router";
 
@@ -23,32 +23,43 @@ const FeedItemComponent = ({
   const router = useRouter();
   const [isHidden, setIsHidden] = useState(false);
 
+  const containerStyle = useMemo(
+    () => [
+      styles.container,
+      {
+        backgroundColor: colors.cardBackground,
+        borderBottomColor: colors.border,
+      },
+    ],
+    [colors.border, colors.cardBackground],
+  );
+
+  const handleHidePost = useCallback(() => {
+    setIsHidden(true);
+  }, []);
+
+  const handleImagePress = useCallback(() => {
+    router.push(`/post/${item.id}`);
+  }, [item.id, router]);
+
   if (isHidden) {
     return null;
   }
 
   return (
-    <View
-      style={[
-        styles.container,
-        {
-          backgroundColor: colors.cardBackground,
-          borderBottomColor: colors.border,
-        },
-      ]}
-    >
+    <View style={containerStyle}>
       <PostHeader
         postId={item.id}
         username={item.user.username}
         avatar={item.user.avatar}
         isVerified={item.user.isVerified}
         locationName={item.location.name}
-        onHidePost={() => setIsHidden(true)}
+        onHidePost={handleHidePost}
       />
 
       <ImageCarousel
         images={item.images}
-        onImagePress={() => router.push(`/post/${item.id}`)}
+        onImagePress={handleImagePress}
       />
 
       <ActionButtons

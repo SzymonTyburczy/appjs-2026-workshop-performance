@@ -1,7 +1,8 @@
-import { useRef, useState } from "react";
+import { useCallback, useMemo, useRef, useState } from "react";
 import {
   FlatList,
   LayoutChangeEvent,
+  ListRenderItem,
   NativeScrollEvent,
   NativeSyntheticEvent,
   StyleSheet,
@@ -21,36 +22,45 @@ export const FeedList = ({
   const layoutHeight = useRef(0);
   const [progress, setProgress] = useState(0);
 
-  const handleScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+  const handleScroll = useCallback((e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const offset = e.nativeEvent.contentOffset.y;
     const max = Math.max(1, contentHeight.current - layoutHeight.current);
     const p = Math.min(1, Math.max(0, offset / max));
     setProgress(p);
-  };
+  }, []);
 
-  const handleContentSizeChange = (_w: number, h: number) => {
+  const handleContentSizeChange = useCallback((_w: number, h: number) => {
     contentHeight.current = h;
-  };
+  }, []);
 
-  const handleLayout = (e: LayoutChangeEvent) => {
+  const handleLayout = useCallback((e: LayoutChangeEvent) => {
     layoutHeight.current = e.nativeEvent.layout.height;
-  };
+  }, []);
+
+  const renderItem = useCallback<ListRenderItem<FeedListItem>>(({ item }) => (
+    item.type === "suggestions" ? (
+      <SuggestedPostsSection posts={item.posts} />
+    ) : (
+      <FeedItem item={item} />
+    )
+  ), []);
+
+  const keyExtractor = useCallback((item: FeedListItem) => item.id, []);
+
+  const progressFillStyle = useMemo(
+    () => [styles.progressFill, { width: `${progress * 100}%` }],
+    [progress],
+  );
 
   return (
     <View style={styles.wrapper}>
       <View style={styles.progressTrack}>
-        <View style={[styles.progressFill, { width: `${progress * 100}%` }]} />
+        <View style={progressFillStyle} />
       </View>
       <FlatList
         data={data}
-        renderItem={({ item }) => (
-          item.type === "suggestions" ? (
-            <SuggestedPostsSection posts={item.posts} />
-          ) : (
-            <FeedItem item={item} />
-          )
-        )}
-        keyExtractor={(item) => item.id}
+        renderItem={renderItem}
+        keyExtractor={keyExtractor}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.content}
         windowSize={21}
