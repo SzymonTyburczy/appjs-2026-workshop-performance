@@ -1,13 +1,15 @@
 import { useCallback, useMemo, useRef, useState } from "react";
 import {
-  FlatList,
   LayoutChangeEvent,
-  ListRenderItem,
   NativeScrollEvent,
   NativeSyntheticEvent,
   StyleSheet,
+  StyleProp,
   View,
+  ViewStyle,
 } from "react-native";
+
+import { FlashList, ListRenderItem } from "@shopify/flash-list";
 
 import { FeedItem } from "@/components/feed/feed-item";
 import { SuggestedPostsSection } from "@/components/feed/suggestions/suggested-posts-section";
@@ -47,7 +49,7 @@ export const FeedList = ({
 
   const keyExtractor = useCallback((item: FeedListItem) => item.id, []);
 
-  const progressFillStyle = useMemo(
+  const progressFillStyle = useMemo<StyleProp<ViewStyle>>(
     () => [styles.progressFill, { width: `${progress * 100}%` }],
     [progress],
   );
@@ -57,16 +59,12 @@ export const FeedList = ({
       <View style={styles.progressTrack}>
         <View style={progressFillStyle} />
       </View>
-      <FlatList
+      <FlashList
         data={data}
         renderItem={renderItem}
         keyExtractor={keyExtractor}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.content}
-        windowSize={21}
-        maxToRenderPerBatch={10}
-        initialNumToRender={5}
-        removeClippedSubviews={false}
         onScroll={handleScroll}
         scrollEventThrottle={16}
         onContentSizeChange={handleContentSizeChange}
