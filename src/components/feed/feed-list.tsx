@@ -1,19 +1,22 @@
-import { useCallback, useMemo, useRef, useState } from "react";
+import { useCallback, useRef } from "react";
 import {
   LayoutChangeEvent,
-  NativeScrollEvent,
-  NativeSyntheticEvent,
   StyleSheet,
-  StyleProp,
   View,
-  ViewStyle,
 } from "react-native";
 
 import { FlashList, ListRenderItem } from "@shopify/flash-list";
+import Animated, {
+  useAnimatedScrollHandler,
+  useAnimatedStyle,
+  useSharedValue,
+} from "react-native-reanimated";
 
 import { FeedItem } from "@/components/feed/feed-item";
 import { SuggestedPostsSection } from "@/components/feed/suggestions/suggested-posts-section";
 import { FeedListItem } from "@/data/mock-feed";
+
+const AnimatedFlashList = Animated.createAnimatedComponent(FlashList) as typeof FlashList;
 
 export const FeedList = ({
   data,
@@ -22,22 +25,26 @@ export const FeedList = ({
 }) => {
   const contentHeight = useRef(0);
   const layoutHeight = useRef(0);
-  const [progress, setProgress] = useState(0);
+  const scrollY = useSharedValue(0);
+  const maxScroll = useSharedValue(1);
 
-  const handleScroll = useCallback((e: NativeSyntheticEvent<NativeScrollEvent>) => {
-    const offset = e.nativeEvent.contentOffset.y;
-    const max = Math.max(1, contentHeight.current - layoutHeight.current);
-    const p = Math.min(1, Math.max(0, offset / max));
-    setProgress(p);
-  }, []);
+  const handleScroll = useAnimatedScrollHandler((event) => {
+    scrollY.value = event.contentOffset.y;
+  });
+
+  const updateMaxScroll = useCallback(() => {
+    maxScroll.value = Math.max(1, contentHeight.current - layoutHeight.current);
+  }, [maxScroll]);
 
   const handleContentSizeChange = useCallback((_w: number, h: number) => {
     contentHeight.current = h;
-  }, []);
+    updateMaxScroll();
+  }, [updateMaxScroll]);
 
   const handleLayout = useCallback((e: LayoutChangeEvent) => {
     layoutHeight.current = e.nativeEvent.layout.height;
-  }, []);
+    updateMaxScroll();
+  }, [updateMaxScroll]);
 
   const renderItem = useCallback<ListRenderItem<FeedListItem>>(({ item }) => (
     item.type === "suggestions" ? (
@@ -49,20 +56,24 @@ export const FeedList = ({
 
   const keyExtractor = useCallback((item: FeedListItem) => item.id, []);
 
-  const progressFillStyle = useMemo<StyleProp<ViewStyle>>(
-    () => [styles.progressFill, { width: `${progress * 100}%` }],
-    [progress],
-  );
+  const getItemType = useCallback((item: FeedListItem) => (
+    item.type === "suggestions" ? "suggestions" : "post"
+  ), []);
+
+  const progressFillStyle = useAnimatedStyle(() => ({
+    width: `${Math.min(1, Math.max(0, scrollY.value / maxScroll.value)) * 100}%`,
+  }));
 
   return (
     <View style={styles.wrapper}>
       <View style={styles.progressTrack}>
-        <View style={progressFillStyle} />
+        <Animated.View style={[styles.progressFill, progressFillStyle]} />
       </View>
-      <FlashList
+      <AnimatedFlashList
         data={data}
         renderItem={renderItem}
         keyExtractor={keyExtractor}
+        getItemType={getItemType}
         showsVerticalScrollIndicator={false}
         contentContainerStyle={styles.content}
         onScroll={handleScroll}

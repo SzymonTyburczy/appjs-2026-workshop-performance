@@ -1,4 +1,4 @@
-import { useState, useContext } from "react";
+import { useCallback, useContext, useState } from "react";
 import { ScrollView, View, Pressable, NativeSyntheticEvent, NativeScrollEvent, StyleSheet } from "react-native";
 
 import { ColorsContext } from "@/context/colors-context";
@@ -17,13 +17,11 @@ export const ImageCarousel = ({
   const [activeIndex, setActiveIndex] = useState(0);
   const colors = useContext(ColorsContext);
 
-  const handleScroll = (e: NativeSyntheticEvent<NativeScrollEvent>) => {
+  const handleMomentumScrollEnd = useCallback((e: NativeSyntheticEvent<NativeScrollEvent>) => {
     const offset = e.nativeEvent.contentOffset.x;
     const index = Math.round(offset / IMAGE_WIDTH);
-    if (index !== activeIndex) {
-      setActiveIndex(index);
-    }
-  };
+    setActiveIndex(index);
+  }, []);
 
   return (
     <View>
@@ -31,8 +29,8 @@ export const ImageCarousel = ({
         horizontal
         pagingEnabled
         showsHorizontalScrollIndicator={false}
-        onScroll={handleScroll}
-        scrollEventThrottle={16}
+        onScrollEndDrag={handleMomentumScrollEnd}
+        onMomentumScrollEnd={handleMomentumScrollEnd}
       >
         {images.map((image, i) => (
           <Pressable key={`${image.uri}-${i}`} onPress={onImagePress}>
