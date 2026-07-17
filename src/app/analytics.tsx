@@ -239,7 +239,6 @@ export default function AnalyticsScreen() {
         {/* Chart */}
         <View style={{ marginTop: 16 }}>
           <PostAnalyticsChart
-            key={dataPoints}
             post={selectedPost}
             colors={colors}
             renderer={SkiaRenderer}

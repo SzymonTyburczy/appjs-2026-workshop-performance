@@ -98,12 +98,25 @@ export function buildStarsPath(data: number[], maxVal: number, outerR: number, i
 
 // --- Math helpers (worklet-safe) ---
 
+/** Linearly resample `arr` (any length) onto `targetLength` points by proportional position. */
+function resample(arr: number[], targetLength: number): number[] {
+  "worklet";
+  if (arr.length === targetLength || arr.length === 0) return arr;
+  if (arr.length === 1) return Array.from({ length: targetLength }, () => arr[0]);
+  return Array.from({ length: targetLength }, (_, i) => {
+    const pos = (i / (targetLength - 1)) * (arr.length - 1);
+    const i0 = Math.floor(pos);
+    const i1 = Math.min(arr.length - 1, i0 + 1);
+    const frac = pos - i0;
+    return arr[i0] + (arr[i1] - arr[i0]) * frac;
+  });
+}
+
 export function lerpArrays(a: number[], b: number[], t: number): number[] {
   "worklet";
-  const longer = a.length >= b.length ? a : b;
-  return longer.map((_, i) => {
-    const va = i < a.length ? a[i] : 0;
-    const vb = i < b.length ? b[i] : 0;
+  const resampledA = resample(a, b.length);
+  return b.map((vb, i) => {
+    const va = resampledA[i] ?? 0;
     return va + (vb - va) * t;
   });
 }
